@@ -1,0 +1,494 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>
+        
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Furniture Haven - Timeless Designs</title>
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">Furniture Haven</div>
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#design-quiz">Design Quiz</a>
+        <a href="#about">About</a>
+        <a href="#blog">Blog</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>Craft Your Dream Space with Timeless Furniture</h1>
+      <p>Explore our curated collection of handcrafted designs, blending elegance, comfort, and sustainability.</p>
+      <a href="#gallery" class="cta-button">Discover Now</a>
+    </div>
+  </section>
+
+  <section id="features" class="features">
+    <div class="container">
+      <h2 class="section-title">Why Furniture Haven?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Unmatched Craftsmanship</h3>
+          <p>Each piece is meticulously crafted using premium materials for lasting durability.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Innovative Designs</h3>
+          <p>Unique, modern designs that elevate any space with style and functionality.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Eco-Friendly Materials</h3>
+          <p>Sourced from sustainable forests, our furniture is kind to the planet.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Personalized Service</h3>
+          <p>Our team is dedicated to helping you find the perfect pieces for your home.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Timeless Aesthetics</h3>
+          <p>Classic and contemporary styles that remain elegant for years to come.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Fast Delivery</h3>
+          <p>Reliable and quick shipping to bring your new furniture home sooner.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="gallery">
+    <div class="container">
+      <h2 class="section-title">Our Extensive Collection</h2>
+      <div class="filter-options">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Seating">Seating</button>
+        <button class="filter-btn" data-filter="Tables">Tables</button>
+        <button class="filter-btn" data-filter="Storage">Storage</button>
+        <button class="filter-btn" data-filter="Beds">Beds</button>
+        <button class="filter-btn" data-filter="Decor">Decor</button>
+      </div>
+      <div class="gallery-grid">
+        <div class="furniture-item" data-category="Seating">
+          <img src="img/ModernLoungeChair.png" alt="Modern Lounge Chair">
+          <div class="furniture-content">
+            <h3>Modern Lounge Chair</h3>
+            <p>Sleek Scandinavian design with premium leather upholstery.</p>
+            <p class="price">$199.99</p>
+            <button onclick="openModal(1)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Tables">
+          <img src="img/Minimalist Dining Table.png" alt="Minimalist Dining Table">
+          <div class="furniture-content">
+            <h3>Minimalist Dining Table</h3>
+            <p>Solid walnut with clean lines for modern dining.</p>
+            <p class="price">$799.99</p>
+            <button onclick="openModal(2)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Seating">
+          <img src="img/Velvet Sofa.png" alt="Velvet Sofa">
+          <div class="furniture-content">
+            <h3>Velvet Sofa</h3>
+            <p>Luxurious velvet with tufted detailing.</p>
+            <p class="price">$1299.99</p>
+            <button onclick="openModal(3)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Storage">
+          <img src="img/Industrial Bookshelf.png" alt="Industrial Bookshelf">
+          <div class="furniture-content">
+            <h3>Industrial Bookshelf</h3>
+            <p>Rustic iron and reclaimed wood for urban lofts.</p>
+            <p class="price">$349.99</p>
+            <button onclick="openModal(4)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Beds">
+          <img src="img/Modern King Bed.png" alt="Modern King Bed">
+          <div class="furniture-content">
+            <h3>Modern King Bed</h3>
+            <p>Low-profile with upholstered headboard.</p>
+            <p class="price">$999.99</p>
+            <button onclick="openModal(5)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Decor">
+          <img src="img/Arched Floor Lamp.png" alt="Arched Floor Lamp">
+          <div class="furniture-content">
+            <h3>Arched Floor Lamp</h3>
+            <p>Elegant brass lamp for ambient lighting.</p>
+            <p class="price">$199.99</p>
+            <button onclick="openModal(6)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Seating">
+          <img src="img/Cozy Armchair.png" alt="Cozy Armchair">
+          <div class="furniture-content">
+            <h3>Cozy Armchair</h3>
+            <p>Plush fabric with sturdy wooden legs.</p>
+            <p class="price">$399.99</p>
+            <button onclick="openModal(7)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Tables">
+          <img src="img/Glass Coffee Table.png" alt="Glass Coffee Table">
+          <div class="furniture-content">
+            <h3>Glass Coffee Table</h3>
+            <p>Tempered glass top with chrome legs.</p>
+            <p class="price">$299.99</p>
+            <button onclick="openModal(8)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Storage">
+          <img src="img/Wooden Cabinet.png" alt="Wooden Cabinet">
+          <div class="furniture-content">
+            <h3>Wooden Cabinet</h3>
+            <p>Classic oak with sliding doors.</p>
+            <p class="price">$599.99</p>
+            <button onclick="openModal(9)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item" data-category="Beds">
+          <img src="img/Platform Bed.png" alt="Platform Bed">
+          <div class="furniture-content">
+            <h3>Platform Bed</h3>
+            <p>Minimalist with slatted base.</p>
+            <p class="price">$799.99</p>
+            <button onclick="openModal(10)">View Details</button>
+          </div>
+        </div>
+        <!-- Initially hidden items -->
+        <div class="furniture-item hidden" data-category="Decor">
+          <img src="img/Round Wall Mirror.png" alt="Round Wall Mirror">
+          <div class="furniture-content">
+            <h3>Round Wall Mirror</h3>
+            <p>Modern mirror with brass frame.</p>
+            <p class="price">$149.99</p>
+            <button onclick="openModal(11)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Seating">
+          <img src="img/Leather Recliner.png" alt="Leather Recliner">
+          <div class="furniture-content">
+            <h3>Leather Recliner</h3>
+            <p>Comfortable recliner with adjustable settings.</p>
+            <p class="price">$699.99</p>
+            <button onclick="openModal(12)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Tables">
+          <img src="img/Marble Side Table.png" alt="Marble Side Table">
+          <div class="furniture-content">
+            <h3>Marble Side Table</h3>
+            <p>Elegant marble top with gold accents.</p>
+            <p class="price">$249.99</p>
+            <button onclick="openModal(13)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Storage">
+          <img src="img/Modern Dresser.png" alt="Modern Dresser">
+          <div class="furniture-content">
+            <h3>Modern Dresser</h3>
+            <p>Sleek dresser with multiple drawers.</p>
+            <p class="price">$499.99</p>
+            <button onclick="openModal(14)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Beds">
+          <img src="img/Canopy Bed.png" alt="Canopy Bed">
+          <div class="furniture-content">
+            <h3>Canopy Bed</h3>
+            <p>Romantic canopy bed with oak frame.</p>
+            <p class="price">$1199.99</p>
+            <button onclick="openModal(15)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Decor">
+          <img src="img/Ceramic Table Lamp.png" alt="Ceramic Table Lamp">
+          <div class="furniture-content">
+            <h3>Ceramic Table Lamp</h3>
+            <p>Artisanal lamp with textured finish.</p>
+            <p class="price">$129.99</p>
+            <button onclick="openModal(16)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Seating">
+          <img src="img/Tufted Ottoman.png" alt="Tufted Ottoman">
+          <div class="furniture-content">
+            <h3>Tufted Ottoman</h3>
+            <p>Versatile ottoman with storage compartment.</p>
+            <p class="price">$199.99</p>
+            <button onclick="openModal(17)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Tables">
+          <img src="img/Console Table.png" alt="Console Table">
+          <div class="furniture-content">
+            <h3>Console Table</h3>
+            <p>Narrow table for hallways or entryways.</p>
+            <p class="price">$349.99</p>
+            <button onclick="openModal(18)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Storage">
+          <img src="img/Open Shelf Unit.png" alt="Open Shelf Unit">
+          <div class="furniture-content">
+            <h3>Open Shelf Unit</h3>
+            <p>Modern open shelving for display and storage.</p>
+            <p class="price">$299.99</p>
+            <button onclick="openModal(19)">View Details</button>
+          </div>
+        </div>
+        <div class="furniture-item hidden" data-category="Beds">
+          <img src="img/Upholstered Queen Bed.png" alt="Upholstered Queen Bed">
+          <div class="furniture-content">
+            <h3>Upholstered Queen Bed</h3>
+            <p>Soft upholstered bed with sturdy frame.</p>
+            <p class="price">$899.99</p>
+            <button onclick="openModal(20)">View Details</button>
+          </div>
+        </div>
+      </div>
+      <div class="see-more">
+        <button id="see-more-btn">See More</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-image">
+          <img id="modal-image" src="" alt="">
+        </div>
+        <div class="modal-details">
+          <h3>Details</h3>
+          <p id="modal-description"></p>
+          <p class="price" id="modal-price"></p>
+          <p id="modal-category"></p>
+          <p id="modal-material"></p>
+          <p id="modal-dimensions"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="design-quiz" class="design-quiz">
+    <div class="container">
+      <div class="quiz-content">
+        <h2 class="section-title">Find Your Design Style</h2>
+        <p>Take our quick quiz to discover furniture that matches your unique taste.</p>
+        <div class="quiz-form">
+          <select id="style-preference">
+            <option value="">Select your style...</option>
+            <option value="modern">Modern</option>
+            <option value="traditional">Traditional</option>
+            <option value="bohemian">Bohemian</option>
+            <option value="industrial">Industrial</option>
+          </select>
+          <select id="room-type">
+            <option value="">Select room type...</option>
+            <option value="living-room">Living Room</option>
+            <option value="bedroom">Bedroom</option>
+            <option value="dining-room">Dining Room</option>
+            <option value="office">Office</option>
+          </select>
+          <select id="color-preference">
+            <option value="">Select color preference...</option>
+            <option value="neutral">Neutral</option>
+            <option value="bold">Bold</option>
+            <option value="pastel">Pastel</option>
+            <option value="monochrome">Monochrome</option>
+          </select>
+          <button onclick="submitQuiz()">Get Recommendations</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="container">
+      <h2 class="section-title">About Furniture Haven</h2>
+      <div class="about-content">
+        <div class="about-text">
+          <h2>Our Journey</h2>
+          <p>Since 2022, Furniture Haven has been a leader in creating furniture that blends aesthetics with functionality. Our artisans combine traditional craftsmanship with modern techniques to produce pieces that stand out.</p>
+          <p>We are committed to sustainability, using eco-friendly materials sourced from responsibly managed forests. Every item is designed to last, ensuring your home remains stylish for years.</p>
+          <p>From cozy armchairs to elegant dining tables, our collections are curated to inspire and transform your living spaces. Join us in creating homes that reflect your unique personality.</p>
+          <p>Our showrooms across the country welcome you to experience our furniture in person, and our online platform makes shopping effortless.</p>
+        </div>
+        <div class="about-image">
+          <img src="img/haven.png" alt="Furniture Showroom">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="blog" class="blog">
+    <div class="container">
+      <h2 class="section-title">Design Inspiration & Tips</h2>
+      <div class="blog-grid">
+        <div class="blog-post">
+          <img src="img/Cozy Living Room.png" alt="Living Room Design">
+          <div class="blog-content">
+            <h3>7 Tips for a Cozy Living Room</h3>
+            <p>Create a warm and inviting space with the right furniture, lighting, and textures.</p>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+        <div class="blog-post">
+          <img src="img/Cozy Dining Table.png" alt="Dining Room Design">
+          <div class="blog-content">
+            <h3>Choosing the Perfect Dining Table</h3>
+            <p>Learn how to select a table that fits your space and style perfectly.</p>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+        <div class="blog-post">
+          <img src="img/Serene Bedroom.png" alt="Bedroom Design">
+          <div class="blog-content">
+            <h3>Designing a Serene Bedroom</h3>
+            <p>Tips for creating a relaxing retreat with the right furniture and decor.</p>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+        <div class="blog-post">
+          <img src="img/Home Office.png" alt="Home Office Design">
+          <div class="blog-content">
+            <h3>Building a Productive Home Office</h3>
+            <p>Maximize your workspace with ergonomic furniture and smart design.</p>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2 class="section-title">Contact Us</h2>
+      <div class="contact-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number (Optional)</label>
+          <input type="tel" id="phone" placeholder="Enter your phone number">
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" placeholder="Enter the subject">
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" placeholder="Your message here" required></textarea>
+        </div>
+        <button class="submit-btn" onclick="submitForm()">Send Message</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-section">
+        <h3>About Furniture Haven</h3>
+        <p>Your trusted source for premium furniture, blending style, comfort, and sustainability since 2022.</p>
+      </div>
+      <div class="footer-section">
+        <h3>Shop</h3>
+        <a href="#gallery">Seating</a>
+        <a href="#gallery">Tables</a>
+        <a href="#gallery">Storage</a>
+        <a href="#gallery">Beds</a>
+        <a href="#gallery">Decor</a>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#blog">Blog</a>
+        <a href="#contact">Contact</a>
+        <a href="#design-quiz">Design Quiz</a>
+      </div>
+      <div class="footer-section">
+        <h3>Contact Info</h3>
+        <p>Email: info@furniturehaven.com</p>
+        <p>Phone: (123) 456-7890</p>
+        <p>Address: 123 Design St, SV8B, Montalban, Rizal</p>
+      </div>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <a href="#">Instagram</a>
+        <a href="#">Twitter</a>
+        <a href="#">Facebook</a>
+        <a href="#">Pinterest</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Furniture Haven. All rights reserved. | Designed with passion.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
